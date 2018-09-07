@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+	<div id="logowanie">
+		<h1>Logowanie</h1>
+		<form id="log">
+			Login: <input type="text" name="fLogin" value=""><br>
+			Hasło: <input type="password" name="fHaslo" value=""><br>
+		</form>
+	<div>
+	
+	<script>
+		function start(){
+			var b = $("<input id='loginButton' type='button' value='Zaloguj'/>");
+			b.bind("click", function(){
+				var form = $("#log > input");
+				var login = form[0].value;
+				var haslo = form[1].value;
+				loguj(login, haslo);
+			});
+			b.appendTo("#log");
+		}
+		
+		function loguj(login, haslo){
+			$.get("/loguj", {login: login, haslo: haslo} ).done(function(data){
+				if (data.indexOf("402") != -1){
+					if ( ! $("#bledHaslo").length){
+						var napis = $("<p id='bledHaslo' style='color:red;'>Błędny login/hasło</p>");
+						napis.appendTo("#logowanie");
+					}
+				} else {
+					odswiez(data);
+				}
+			});
+		}
+		
+		function wyslijZlecenie(kwota, oprocentowanie, raty, numer){
+			$.get("/zlecenie", {kwota: kwota, 
+								oprocentowanie: oprocentowanie, 
+								raty: raty, 
+								numer: numer} )
+				.done(function(data){
+					if (data.indexOf("402") != -1){
+						if ( ! $("#odr").length){
+							var napis = $("<p id='odr' style='color:red;'>Odrzucono zlecenie.</p>");
+							napis.appendTo("#pozyczka");
+						}
+					} else {
+						odswiez(data);
+					}
+				});
+		}
+		
+		function odswiez(data){
+			$("#logowanie").attr("style","display: none;");
+			if ( $("#dane").length){
+				$("#dane").remove();
+				$("#pozyczka").remove();
+			}
+			var daneDiv = $("<div id='dane'></div>");
+			var pozyczkaDiv = $("<div id='pozyczka'></div>");
+			daneDiv.appendTo("body");
+			pozyczkaDiv.appendTo("body");
+			
+			
+			var op = data.split("-");
+			var parametry = op[1].split(";");
+			var s = $("<p>Imię: " + parametry[2] 
+			+ "</p><br><p>Nazwisko: " + parametry[3] 
+			+ "</p><br><p>Numer: " + parametry[0] 
+			+ "</p><br><p>Stan: " + parametry[1] + "</p><br>");
+			s.appendTo("#dane");
+			
+			var numer = parametry[0];
+			
+			var form = $("<form id='poz'>Kwota: <input type='text' name='fKwota' value=''><br>Oprocentowanie: <input type='text' name='fOprocentowanie' value=''><br>Liczba rat: <input type='text' name='fRaty' value=''><br></form>");
+			
+			form.appendTo(pozyczkaDiv);
+			
+			var b = $("<input id='pozyczkaButton' type='button' value='wyslij zlecenie'/>");
+			b.bind("click", function(){
+				var form = $("#poz > input");
+				var kwota = form[0].value;
+				var oprocentowanie = form[1].value;
+				var raty = form[2].value;
+				wyslijZlecenie(kwota, oprocentowanie, raty, numer);
+			});
+			b.appendTo("#poz");
+		}
+		
+		$(document).ready(function() {
+			start();
+		});
+	</script>
+</body>
+</html>
