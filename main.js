@@ -9,6 +9,11 @@ app.get('/index', function (req, res){
 	res.sendFile(path.join(__dirname + "/index.html"));
 	//res.send('<!DOCTYPE html><html><head><script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script></head><body><h1>Logowanie</h1><form id="log">Login: <input type="text" name="fLogin" value=""><br>Hasło: <input type="password" name="fHaslo" value=""><br></form><script>function start(){var b = $("<input id=\'loginButton\' type=\'button\' value=\'Zaloguj\'/>");b.bind("click", function(){var form = $("#log > input");var login = form[0].value;var haslo = form[1].value;loguj(login, haslo);alert(login.toString() + " " + haslo);});b.appendTo("#log");}function loguj(login, haslo){alert("dziala");$.get("/test2", {login: login, haslo: haslo} ).done(function(data){});}$(document).ready(function() {start();});</script></body></html>');
 });
+
+app.get('/jquery', function (req, res){
+	res.sendFile(path.join(__dirname + "/jquery-3.3.1.min.js"));
+});
+
 app.get('/loguj', function (req, res) {
 	console.log("start logowanie");
 	amqp.connect('amqp://localhost', function(err, conn) {
